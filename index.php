@@ -1,37 +1,71 @@
 <?php
+var_dump($_POST['ingreso']);
+
+$usuarioPrueba_user ='usuario@prueba.ts';
+$contraseñaPrueba_user ='contraseña';
+//$contraseñaPrueba_hash = password_hash('contraseña', );
+
+
+
+
+
 echo"<pre>";
 var_dump('$_POST');
 echo"</pre>";
 
 //validar
-
-if (!isset($_POST['mail'])) {
-    echo "No existe mail.<hr>";
-} else {
-    echo 'Existe mail.<hr>';
-    $mail = $_POST['mail'];
-    if (empty(trim($mail))) {
-        echo 'No puede estar vacío.<hr>';
+if (isset($_POST['ingreso'])) {
+    if (!isset($_POST['mail'])) {
+        echo "No existe mail.<hr>";
     } else {
-        echo 'Mail no vacío.<hr>';
-        if (filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-            echo 'Formato no válido.<hr>';
+        echo 'Existe mail.<hr>';
+        $mail = trim($_POST['mail']);
+        if (empty($mail)) {
+            echo 'No puede estar vacío.<hr>';
         } else {
-            echo 'Formato válido.<hr>';
+            echo 'Mail no vacío.<hr>';
+            if (strlen($mail) < 5 || strlen($mail) > 120) {
+                echo 'Por favor ingreso un mail entre 5 y 120 caracteres.<hr>';
+            } else {
+                echo 'Es un correo válido.<hr>';
+                if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
+                    echo 'Formato no válido.<hr>';
+                } else {
+                    echo 'Formato válido.<hr>';
+                    if ($mail !== $usuarioPrueba_user) {
+                        echo 'Usuario inválido.<hr>';
+                    } else {
+                        echo 'Usuario válido.<hr>';
+                    }
+                }
+            }
         }
-    }
-} 
-if (!isset($_POST['password'])) {
-    echo "No existe contraseña.<hr>";
-} else {
-    echo 'Existe contraseña.<hr>';
-    $password = $_POST['password'];
-    if (empty(trim($password))) {
-        echo 'No puede estar vacío.<hr>';
+    } 
+    if (!isset($_POST['password'])) {
+        echo "No existe contraseña.<hr>";
     } else {
-        echo 'Mail no vacío.<hr>';
-    }
-} 
+        echo 'Existe contraseña.<hr>';
+        $password = trim($_POST['password']);
+        if (empty($password)) {
+            echo 'No puede estar vacío.<hr>';
+        } else {
+            echo 'Contraseña no vacío.<hr>';
+            if (strlen($password) < 3 || strlen($password) > 10) {
+                echo 'Por favor ingrese una contraseña entre 3 y 10 caracteres.<hr>';
+            } else {
+                echo 'Contraseña válida.<hr>';
+                if ($mail !== $usuarioPrueba_user) {
+                    echo 'Usuario inválido.<hr>';
+                } else {
+                    echo 'Usuario válido.<hr>';
+                }
+            }
+        }
+    } 
+} else {
+    echo'Botón de ingreso no existe.<hr>';
+}
+
 
 
 ?>
@@ -57,7 +91,7 @@ if (!isset($_POST['password'])) {
                 <input type="password" name="password" placeholder="Ingrese su contraseña">
             </div>
             <div class="col_12 flex flex-justify-center button_log">
-                <button>Iniciar</button>
+                <button type="submit" name="ingreso">Ingresar</button>
             </div>
         </form>
     </main>
