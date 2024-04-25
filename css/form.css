@@ -39,7 +39,6 @@ h1 {
 
 }
 .msg_error {
-    background-color: red;
-    color:rgb(167, 5, 5);
+    color:rgb(151, 2, 2);
     font-size: 0.9rem;
 }
