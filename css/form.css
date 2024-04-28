@@ -42,3 +42,34 @@ h1 {
     color:rgb(151, 2, 2);
     font-size: 0.9rem;
 }
+.reg_cont {
+    margin-top: 7rem;
+    margin-bottom: 7rem;
+    background-color: white;
+    padding: 1em;
+    border-radius: 0.2rem;
+    border: 2px solid rgb(36, 36, 80);
+}
+.button_reg button{
+    padding: 0.5em;
+    border-radius: 0.5em;
+    border: 2px solid rgb(36, 36, 80);
+    color: rgb(36, 36, 80);
+    font-size: 1.2em;
+}
+.button_reg button:hover{
+    background-color: rgb(36, 36, 80);
+    color: white;
+}
+label {
+    font-size: 1rem;
+}
+.inputs #termCond{
+    width: 1rem;
+}
+.termCond {
+    flex-wrap: wrap;
+}
+.chico input, .chico select{
+    width: 60%;
+}

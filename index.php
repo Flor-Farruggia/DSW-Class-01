@@ -24,7 +24,7 @@ $error_pass = '';
 if (isset($_POST['ingreso'])) {
 
     $errorFlag = false;
-    
+
     #VALIDACIONES MAIL
         #existe?
         if (!isset($_POST['mail'])) {
@@ -40,7 +40,7 @@ if (isset($_POST['ingreso'])) {
                 $error_mail = 'No puede estar vacío';
                 $errorFlag = true;
             } else {
-            }        
+            }
         }
 
         #Cantidad caracteres
