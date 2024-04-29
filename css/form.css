@@ -67,7 +67,7 @@ label {
 .inputs #termCond{
     width: 1rem;
 }
-.termCond {
+.wrap {
     flex-wrap: wrap;
 }
 .chico input, .chico select{
