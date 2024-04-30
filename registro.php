@@ -1,4 +1,5 @@
 <?php
+var_dump($_POST);
 $nombre = '';
 $apellido = '';
 $DNI = '';
@@ -13,6 +14,7 @@ $termCond = '';
 
 $fechaMin = date('1920-01-01'); #104
 $fechaMax = date('2007-01-01'); #17
+$fechaValida = '';
 
 $errorNombre = '';
 $errorApellido = '';
@@ -25,10 +27,6 @@ $errorMail = '';
 $errorPass = '';
 $errorPass2 = '';
 $errorTerm = '';
-
-
-
-
 
 
 if (isset($_POST['registro'])) {
@@ -163,15 +161,24 @@ if (isset($_POST['registro'])) {
             } else {
             }
         }
+        #Cantidad caracteres
+        if (empty($errorFechaNac)) {
+            if (strlen($fechaNac) < 10 || strlen($fechaNac) > 10) {
+                $errorFechaNac = 'Por favor ingrese una fecha válida como 2000-12-10';
+                $errorFlag = true;
+            } else {
+            }
+        }
 
-        #Validación rango etario
-        // if (empty($errorFechaNac)) {
-        //     if () {
-        //         $errorFechaNac = '';
-        //         $errorFlag = true;
-        //     } else {
-        //     }
-        // }
+        #Validación formato fecha
+        if (empty($errorFechaNac)) {
+            $fechaValida =  Strtotime($fechaNac);
+            if ($fechaValida !== false) {
+            } else {
+                $errorFechaNac = '';
+                $errorFlag = true;
+            }
+        }
     #FINAL validaciones FECHA NACIMIENTO ######################################################################
 
     #VALIDACIONES GENERO ######################################################################
@@ -183,67 +190,68 @@ if (isset($_POST['registro'])) {
             $genero = trim($_POST['genero']);
         }
 
+        #es un valor válido?
+        $campoValidoGenero = array ('M', 'F', 'O');
+        $generoFlag= true;
+        foreach ($campoValidoGenero as $indice => $value) {
+            if (strtolower($genero) == strtolower($value)) {
+                $generoFlag = false;
+            }
+        }
+        if($generoFlag===true){
+            $errorGenero = "No existe campo genero";
+            $errorFlag = true; 
+        }
+
+
+    #FINAL validaciones GENERO ################################################################
+
+    #VALIDACIONES TELEFONO ######################################################################
+        #existe?
+        if (!isset($_POST['telefono'])) {
+            $errorTel = "No existe campo telefono";
+            $errorFlag = true;
+        } else {
+            $telefono = trim($_POST['telefono']);
+        }
+
         #está vacío?
-        if (empty($errorGenero)) {
-            if (empty($genero)) {
-                $errorGenero = 'No puede estar vacío';
+        if (empty($errorTel)) {
+            if (empty($telefo)) {
+                $errorTel = 'No puede estar vacío';
                 $errorFlag = true;
             } else {
             }
         }
-    #FINAL validaciones GENERO ################################################################
 
-    #VALIDACIONES TELEFONO ######################################################################
-    #existe?
-    if (!isset($_POST['telefono'])) {
-        $errorTel = "No existe campo telefono";
-        $errorFlag = true;
-    } else {
-        $telefono = trim($_POST['telefono']);
-    }
-
-    #está vacío?
-    if (empty($errorTel)) {
-        if (empty($telefo)) {
-            $errorTel = 'No puede estar vacío';
-            $errorFlag = true;
-        } else {
+        #caracteres validos (numericos)
+        if (empty($errorTel)) {
+            if (!is_numeric($telefono)) {
+                $errorTel = 'Por favor ingrese solo números';
+                $errorFlag = true;
+            } else {
+            }
         }
-    }
     #FINAL validaciones TELEFONO################################################################
 
     #VALIDACIONES PROVINCIA ######################################################################
-    #existe?
-    if (!isset($_POST['provincia'])) {
-        $errorProvincia = "No existe campo provincia";
-        $errorFlag = true;
-    } else {
-        $provincia = trim($_POST['provincia']);
-    }
-
-    #está vacío?
-    if (empty($errorProvincia)) {
-        if (empty($Provincia)) {
-            $errorProvincia = 'No puede estar vacío';
+        #existe?
+        if (!isset($_POST['provincia'])) {
+            $errorProvincia = "No existe campo provincia";
             $errorFlag = true;
         } else {
+            $provincia = trim($_POST['provincia']);
         }
-    }
-    // if (empty($errorProvincia)) {
-    //     if ($provincia == "") {
-    //         $errorProvincia = 'No puede estar vacío';
-    //         $errorFlag = true;
-    //     } else {
-    //         echo "selected";
-    //     }
-    // }
+
+        #está vacío? ---------------DEBERÍA SER SI ESTÁ SELECTED EN ALGUNA OPCIÓN---------
+        if (empty($errorProvincia)) {
+            if (empty($Provincia)) {
+                $errorProvincia = 'No puede estar vacío';
+                $errorFlag = true;
+            } else {
+            }
+        }
     #FINAL validaciones PROVINCIA ################################################################
-
-    #VALIDACIONES SEGUNDA PASSWORD ######################################################################
-    #FINAL validaciones SEGUNDA PASSWORD################################################################
-
-    #VALIDACIONES TERMINOS Y CONDICIONES ######################################################################
-    #FINAL validaciones TERMINOS Y CONDICIONES################################################################
 
     #VALIDACIONES MAIL ######################################################################
         #existe?
@@ -278,7 +286,6 @@ if (isset($_POST['registro'])) {
                     $errorMail = 'Formato no válido';
                     $errorFlag = true;
                 } else {
-                   // echo 'Formato válido.<hr>';
             }
         }
     #FINAL validaciones mail ######################################################################
@@ -290,7 +297,6 @@ if (isset($_POST['registro'])) {
             $errorPass = 'No existe contraseña';
             $errorFlag = true;
         } else {
-            //echo 'Existe contraseña.<hr>';
             $password = trim($_POST['password']);
         }
 
@@ -300,7 +306,6 @@ if (isset($_POST['registro'])) {
                 $errorPass = 'No puede estar vacío';
                 $errorFlag = true;
             } else {
-                //echo 'Contraseña no vacío.<hr>';
             }
         }
 
@@ -313,7 +318,58 @@ if (isset($_POST['registro'])) {
             }
         }
     #FINAL validaciones password ######################################################################
+    
+    #VALIDACIONES SEGUNDA PASSWORD ######################################################################
+    
+        #Existe?
+        if (!isset($_POST['password2'])) {
+            $errorPass2 = 'No existe segunda contraseña';
+            $errorFlag = true;
+        } else {
+            $password2 = trim($_POST['password2']);
+        }
 
+        #Vacío?
+        if (empty($errorPass2)) {
+            if (empty($password2)) {
+                $errorPass2 = 'No puede estar vacío';
+                $errorFlag = true;
+            } else {
+            }
+        }
+
+        #Caracteres validos?
+        if (empty($errorPass2)){
+            if (strlen($password2) < 3 || strlen($password2) > 10) {
+                $errorPass2 = 'Por favor ingrese una contraseña entre 3 y 10 caracteres';
+                $errorFlag = true;
+            } else {
+            }
+        }
+
+        #Es la misma que la anterior?
+        if (empty($errorPass&&$errorPass2)){
+            if ($password !== $password2) {
+                $errorPass = 'Por favor ingrese la misma contraseña en ambos campos';
+                $errorPass2 = 'Por favor ingrese la misma contraseña en ambos campos';
+                $errorFlag = true;
+            } else {
+            }
+        }
+    #FINAL validaciones SEGUNDA PASSWORD################################################################
+
+    #VALIDACIONES TERMINOS Y CONDICIONES ######################################################################
+        #Existe?
+        if (!isset($_POST['termCond'])) {
+            $errorTerm = 'No existen los termino y condiciones';
+            $errorFlag = true;
+        } else {
+            $termCond = trim($_POST['termCond']);
+        }
+        #está en check?
+        $campoCheck= ;
+
+    #FINAL validaciones TERMINOS Y CONDICIONES################################################################
 
     } else {
 }
@@ -352,12 +408,18 @@ if (isset($_POST['registro'])) {
                 <output class="col_12 msg_error "><?=$errorFechaNac?></output>
             </div>
             <div class="col_12 inputs column">
-                <input type="radio" id="masculino" name="genero" value="Masculino">
-                <label for="masculino">Masculino</label>
-                <input type="radio" id="femenino" name="genero" value="Femenino">
-                <label for="femenino">Femenino</label>
-                <input type="radio" id="otro" name="genero" value="Otro">
-                <label for="otro">Otro</label>
+            <div class="col_3 flex flex-align-center">
+                    <input type="radio"name="genero" value="M" <?=($genero=='M')?'checked':''?>>
+                    <label for="M">Masculino</label>
+                </div>
+                <div class="col_3 flex flex-align-center">
+                    <input type="radio" name="genero" value="F"<?=($genero=='F')?'checked':''?>>
+                    <label for="F">Femenino</label>
+                </div>
+                <div class="col_3 flex flex-align-center">
+                    <input type="radio" name="genero" value="O"<?=($genero=='O')?'checked':''?>>
+                    <label for="O">Otro</label>
+                </div>
                 <output class="col_12 msg_error "><?=$errorGenero?></output>
             </div>
             <div class="col_12 inputs chico">
@@ -365,7 +427,7 @@ if (isset($_POST['registro'])) {
                 <output class="col_12 msg_error "><?=$errorTel?></output>
             </div>
             <div class="col_12 inputs chico">
-                <select name="provincia" id="provincia">
+                <select name="provincia">
                     <option value="">Selecciona una provincia</option>
                     <option value="BuenosAires">Buenos Aires</option>
                     <option value="Catamarca">Catamarca</option>
@@ -406,7 +468,7 @@ if (isset($_POST['registro'])) {
                 <output class="col_12 msg_error "><?=$errorPass2?></output>
             </div>
             <div class="col_12 inputs column">
-                <input type="checkbox" id="termCond" name="termCond" value="termCond">
+                <input type="checkbox" name="termCond" value="termCond">
                 <label for="termCond"> Acepta los términos y condiciones?</label>
                 <output class="col_12 msg_error "><?=$errorTerm?></output>
             </div>
