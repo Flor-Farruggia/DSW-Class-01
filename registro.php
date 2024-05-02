@@ -61,13 +61,13 @@ if (isset($_POST['registro'])) {
         }
 
         #validar caracteres aceptables
-        if (empty($errorNombre)) {
-            if (!is_string($nombre)) {
-                $errorNombre = 'Por favor ingreso un nombre con caracteres alfabéticos';
-                $errorFlag = true;
-            } else {
-            }
-        }
+#        if (empty($errorNombre)) {
+#            if () {
+#                $errorNombre = 'Por favor ingreso un nombre con caracteres alfabéticos';
+#                $errorFlag = true;
+#            } else {
+#            }
+#        }
     #FINAL validaciones NOMBRE ######################################################################
 
     #VALIDACIONES APELLIDO ######################################################################
@@ -99,7 +99,7 @@ if (isset($_POST['registro'])) {
 
         #Validar caracteres aceptables
         if (empty($errorApellido)) {
-            if (!is_string($apellido)) {
+            if () {
                 $errorApellido = 'Por favor ingreso un apellido con caracteres alfabéticos';
                 $errorFlag = true;
             } else {
@@ -174,9 +174,9 @@ if (isset($_POST['registro'])) {
         if (empty($errorFechaNac)) {
             $fechaValida =  Strtotime($fechaNac);
             if ($fechaValida !== false) {
-            } else {
-                $errorFechaNac = '';
+                $errorFechaNac = 'Formato de fecha inválido';
                 $errorFlag = true;
+            } else {
             }
         }
     #FINAL validaciones FECHA NACIMIENTO ######################################################################
@@ -217,7 +217,7 @@ if (isset($_POST['registro'])) {
 
         #está vacío?
         if (empty($errorTel)) {
-            if (empty($telefo)) {
+            if (empty($telefono)) {
                 $errorTel = 'No puede estar vacío';
                 $errorFlag = true;
             } else {
@@ -225,13 +225,14 @@ if (isset($_POST['registro'])) {
         }
 
         #caracteres validos (numericos)
-        if (empty($errorTel)) {
-            if (!is_numeric($telefono)) {
-                $errorTel = 'Por favor ingrese solo números';
-                $errorFlag = true;
-            } else {
-            }
-        }
+        //Está mal porque si en el número agregan el (+54) te desconfigura todo
+//        if (empty($errorTel)) {
+//            if (!is_numeric($telefono)) {
+//                $errorTel = 'Por favor ingrese solo números';
+//                $errorFlag = true;
+//            } else {
+//            }
+//        }
     #FINAL validaciones TELEFONO################################################################
 
     #VALIDACIONES PROVINCIA ######################################################################
@@ -367,7 +368,7 @@ if (isset($_POST['registro'])) {
             $termCond = trim($_POST['termCond']);
         }
         #está en check?
-        $campoCheck= ;
+        
 
     #FINAL validaciones TERMINOS Y CONDICIONES################################################################
 
