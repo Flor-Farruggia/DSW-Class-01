@@ -1,29 +1,26 @@
 <?php
 var_dump($_POST);
 $nombre = '';
-$error = '';
 $msg = '';
-
-
 
 if (isset($_POST['enviar'])) {
 
-    function validacion($campo, $min, $max) {
+    function validacion($campo, $min, $max, $campoName) {
         $msg = '';
         $error = false;
         $campo2 = '';
 
         if (!isset($_POST[$campo])) {
-            $msg = "No existe campo $campo";
+            $msg = "No existe campo ".$campoName;
             $error = true;
         } else {
             $campo2 = trim($_POST[$campo]);
             if (empty($campo2)) {
-                $msg = 'No puede estar vacío';
+                $msg = 'No puede estar vacío el campo '.$campoName;
                 $error = true;
             } else {
                 if (strlen($campo2) < $min || strlen($campo2) > $max) {
-                    $msg = 'Por favor ingreso entre '.$min.' y '.$max.' caracteres';
+                    $msg = 'Por favor ingrese entre '.$min.' y '.$max.' caracteres';
                     $error = true;
                 } else {
                 }
@@ -35,16 +32,26 @@ if (isset($_POST['enviar'])) {
 
         return $resultado;
     }
+    function soloAlfabetico($texto) {// Expresión regular, si da FALSO entonces tiene otros caracteres no alfabeticos
+        return preg_match('/^[a-zA-Z]+$/', $texto);
+    }
     #VALIDACIONES NOMBRE ######################################################################
 
-$valNombre = validacion('nombre', 3, 10);
-echo "<pre>";
-var_dump ($valNombre);
-echo "</pre>";
+    $valNombre = validacion('nombre', 3, 10, 'nombre');
+    $valNombreAlf = soloAlfabetico('nombre');
 
+    if ($valNombre['error']) {
+        $msg = $valNombre['msg'];
+    } else {
+        if ($valNombreAlf==false) {
+            $msg = 'Debe contener solo caracteres alfabéticos';
+            $error = true;
+        }else{
+            $nombre = $valNombre['campo2'];
+        }
+    }
 
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">

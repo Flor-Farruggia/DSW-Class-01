@@ -1,149 +1,369 @@
 <?php
-$usuarioPrueba_user ='usuario@prueba.ts';
-$usuarioPrueba_pass ='password';
-$usuarioPrueba_passHash = password_hash($usuarioPrueba_pass, PASSWORD_DEFAULT);
-
-
-/**
- *echo "usuario prueba:$usuarioPrueba_user".'<br>';
-*echo 'constraseña prueba: '.$usuarioPrueba_pass.'<br>';
-*echo 'contraseña hasheada: '.$usuarioPrueba_passHash.'<br>';
-
-*echo"<pre>";
-*var_dump('$_POST');
-*echo"</pre>";
- */
+var_dump($_POST);
+$nombre = '';
+$apellido = '';
+$DNI = '';
+$fechaNac = '';
+$genero = '';
+$telefono = '';
+$provincia = '';
 $mail = '';
 $password = '';
+$password2 = '';
+$termCond = '';
 
-$error_mail = '';
-$error_pass = '';
+$fechaMin = date('1920-01-01'); #104
+$fechaMax = date('2007-01-01'); #17
+$fechaValida = '';
 
-//validar
-if (isset($_POST['ingreso'])) {
+$msg = '';
+
+$errorNombre = '';
+$errorApellido = '';
+$errorDNI = '';
+$errorFechaNac = '';
+$errorGenero = '';
+$errorTel = '';
+$errorProvincia = '';
+$errorMail = '';
+$errorPass = '';
+$errorPass2 = '';
+$errorTerm = '';
+
+
+
+if (isset($_POST['registro'])) {
 
     $errorFlag = false;
-    #validaciones mail
+
+    function validacion($campo, $min, $max, $campoName) {
+        $msg = '';
+        $error = false;
+        $campo2 = '';
+
+        if (!isset($_POST[$campo])) {
+            $msg = "No existe campo ".$campoName;
+            $error = true;
+        } else {
+            $campo2 = trim($_POST[$campo]);
+            if (empty($campo2)) {
+                $msg = 'No puede estar vacío el campo '.$campoName;
+                $error = true;
+            } else {
+                if (strlen($campo2) < $min || strlen($campo2) > $max) {
+                    $msg = 'Por favor ingrese entre '.$min.' y '.$max.' caracteres';
+                    $error = true;
+                } else {
+                }
+            }
+        }
+        $resultado['msg'] =$msg;
+        $resultado['error'] =$error;
+        $resultado['campo2'] =$campo2;
+
+        return $resultado;
+    }
+
+    #VALIDACIONES NOMBRE ######################################################################
+        $valNombre = validacion('nombre', 3, 100, 'nombre');
+
+        if ($valNombre['error']) {
+            $errorNombre = $valNombre['msg'];
+        } else {
+            $nombre = $valNombre['campo2'];
+        }
+
+    #FINAL validaciones NOMBRE ######################################################################
+
+    #VALIDACIONES APELLIDO ######################################################################
+    $valApellido = validacion('apellido', 2, 100, 'apellido');
+
+    if ($valApellido['error']) {
+        $errorApellido = $valApellido['msg'];
+    } else {
+        $apellido = $valApellido['campo2'];
+    }
+    #FINAL validaciones APELLIDO ######################################################################
+
+    #VALIDACIONES DNI ######################################################################
+    $valDNI = validacion('DNI', 7, 11, 'DNI');
+
+    if ($valDNI['error']) {
+        $errorDNI = $valDNI['msg'];
+    } else {
+            if (!is_numeric($valDNI['campo2'])) {
+                $errorDNI = 'Por favor ingrese solo números';
+                $error = true;
+            } else {
+                $DNI = $valDNI['campo2'];
+            }
+    }
+
+    #FINAL validaciones DNI ######################################################################
+
+    #VALIDACIONES FECHA NACIMIENTO ################################################################
+    $valFechaNac = validacion('fechaNac', 10, 10, 'Fecha de nacimiento');
+
+    if ($valFechaNac['error']) {
+        $errorFechaNac = $valFechaNac['msg'];
+    } else {
+        $fechaValida =  Strtotime($fechaNac);
+        if ($fechaValida !== false) {
+            $errorFechaNac = 'Formato de fecha inválido';
+            $errorFlag = true;
+        } else {
+            $fechaNac = $valFechaNac['campo2'];
+        }
+    }
+    #FINAL validaciones FECHA NACIMIENTO ######################################################################
+
+    #VALIDACIONES GENERO ######################################################################
         #existe?
-        if (!isset($_POST['mail'])) {
-            $error_mail = "No existe mail";
+        if (!isset($_POST['genero'])) {
+            $errorGenero = "No existe campo genero";
             $errorFlag = true;
         } else {
-            echo 'Existe mail.<hr>';
-            $mail = trim($_POST['mail']);
+            $genero = trim($_POST['genero']);
         }
 
-        #está vacío?
-        if (empty($error_mail)) {
-            if (empty($mail)) {
-                $error_mail = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-                echo 'Mail no vacío.<hr>';
-            }        
+        #es un valor válido?
+        $campoValidoGenero = array ('M', 'F', 'O');
+        $generoFlag= true;
+        foreach ($campoValidoGenero as $indice => $value) {
+            if (strtolower($genero) == strtolower($value)) {
+                $generoFlag = false;
+            }
+        }
+        if($generoFlag===true){
+            $errorGenero = "No existe campo genero";
+            $errorFlag = true;
         }
 
-        #Cantidad caracteres
-        if (empty($error_mail)) {
-            if (strlen($mail) < 5 || strlen($mail) > 120) {
-                $error_mail = 'Por favor ingreso un mail entre 5 y 120 caracteres';
-                $errorFlag = true;
-            } else {
-                echo 'Cantidad de caracteres válidos.<hr>';
+
+    #FINAL validaciones GENERO ################################################################
+
+    #VALIDACIONES TELEFONO ######################################################################
+        $valTel = validacion('telefono', 9, 18, 'teléfono');
+
+        if ($valTel['error']) {
+            $errorTel = $valTel['msg'];
+        } else {
+            $telefono = $valTel['campo2'];
+        }
+    #FINAL validaciones TELEFONO################################################################
+
+    #VALIDACIONES PROVINCIA ######################################################################
+        //Existe?
+        if (!isset($_POST['provincia'])) {
+            $errorProvincia = "Debe seleccionar una provincia";
+            $errorFlag = true;
+        } else {
+            $provincia = trim($_POST['provincia']);
+        }
+
+        //Provincia válida?
+        $provinciaValida = false;
+        $provinciasValidas = array("BuenosAires", "Catamarca", "Chaco", "Chubut", "Córdoba", "Corrientes",
+        "EntreRíos", "Formosa", "Jujuy", "LaPampa", "LaRioja", "Mendoza", "Misiones", "Neuquén", "RíoNegro",
+        "Salta", "SanJuan", "SanLuis", "SantaCruz", "SantaFe", "SantiagoDelEstero", "TierraDelFuego", "Tucumán");
+
+        foreach ($provinciasValidas as $validProvincia) {
+            if ($provincia === $validProvincia) {
+                $provinciaValida = true;
+                break;
             }
         }
 
-        #Formato válido
-            if (empty($error_mail)) {
-                if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-                    $error_mail = 'Formato no válido';
-                    $errorFlag = true;
-                } else {
-                    echo 'Formato válido.<hr>';
-            }
+        if (!$provinciaValida) {
+            $errorProvincia = "Debe seleccionar una provincia válida";
+            $errorFlag = true;
         }
-    #FINAL validaciones
+    #FINAL validaciones PROVINCIA ################################################################
 
-    #Inicio validaciones password
-        
-        #Existe mail
-        if (!isset($_POST['password'])) {
-            $error_pass = 'No existe contraseña';
+    #VALIDACIONES MAIL ######################################################################
+    $valMail = validacion('mail', 5, 120, 'e-mail');
+
+    if ($valMail['error']) {
+        $errorMail = $valMail['msg'];
+    } else {
+        if (!filter_var($valMail['campo2'], FILTER_VALIDATE_EMAIL)) {
+            $errorMail = 'Formato no válido';
+            $error = true;
+        } else {
+            $mail = $valMail['campo2'];
+        }
+    }
+    #FINAL validaciones mail ######################################################################
+
+    #INICIO VALIDACIONES PASSWORD ######################################################################
+    $valPass = validacion('password', 5, 10, 'contraseña');
+
+    if ($valPass['error']) {
+        $errorPass = $valPass['msg'];
+    } else {
+        $password = $valPass['campo2'];
+    }
+    #FINAL validaciones password ######################################################################
+
+    #VALIDACIONES SEGUNDA PASSWORD ######################################################################
+    $valPass2 = validacion('password2', 5, 10, 'contraseña');
+
+    if ($valPass2['error']) {
+        $errorPass2 = $valPass2['msg'];
+    } else {
+        $password2 = $valPass2['campo2'];
+    }
+
+    #Es la misma que la anterior?
+    if (empty($errorPass&&$errorPass2)){
+        if ($password !== $password2) {
+            $errorPass = 'Por favor ingrese la misma contraseña en ambos campos';
+            $errorPass2 = 'Por favor ingrese la misma contraseña en ambos campos';
             $errorFlag = true;
         } else {
-            echo 'Existe contraseña.<hr>';
         }
-
-    #FINAL validaciones password
-    
-
-/*
-    if (!isset($_POST['mail'])) {
-        $error_mail = "No existe mail";
+    }
+    #FINAL validaciones SEGUNDA PASSWORD################################################################
+    #VALIDACIONES TÉRMINOS Y CONDICIONES ######################################################################
+    //Existe?
+    if (!isset($_POST['termCond'])) {
+        $errorTerm = "Debe aceptar los términos y condiciones";
         $errorFlag = true;
     } else {
-        echo 'Existe mail.<hr>';
-        $mail = trim($_POST['mail']);
-        if (empty($mail)) {
-            $error_mail = 'No puede estar vacío';
-            $errorFlag = true;
-        } else {
-            echo 'Mail no vacío.<hr>';
-            if (strlen($mail) < 5 || strlen($mail) > 120) {
-                $error_mail = 'Por favor ingreso un mail entre 5 y 120 caracteres';
-                $errorFlag = true;
-            } else {
-                echo 'Es un correo válido.<hr>';
-                if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-                    $error_mail = 'Formato no válido';
-                    $errorFlag = true;
-                } else {
-                    echo 'Formato válido.<hr>';
-                    if ($mail !== $usuarioPrueba_user) {
-                        $error_mail = 'Usuario inválido';
-                        $errorFlag = true;
-                    } else {
-                        echo 'Usuario válido.<hr>';
-                    }
-                }
-            }
-        }
-    } 
-    if (!isset($_POST['password'])) {
-        $error_pass = 'No existe contraseña';
-        $errorFlag = true;
+        $termCond = $_POST['termCond'];
+    }
+    #FINAL validaciones TÉRMINOS Y CONDICIONES ################################################################
+
     } else {
-        echo 'Existe contraseña.<hr>';
-        $password = trim($_POST['password']);
-        if (empty($password)) {
-            $error_pass = 'No puede estar vacío';
-            $errorFlag = true;
-        } else {
-            echo 'Contraseña no vacío.<hr>';
-            if (strlen($password) < 3 || strlen($password) > 10) {
-                $error_pass = 'Por favor ingrese una contraseña entre 3 y 10 caracteres';
-                $errorFlag = true;
-            } else {
-                echo 'Contraseña válida.<hr>';
-                
-                if ($mail === $usuarioPrueba_user) {
-                    $verificar = password_verify($password, $usuarioPrueba_passHash);
-                    if ($verificar === false) {
-                        $error_pass = 'Contraseña incorrecta';
-                        $errorFlag = true;
-                    } else {
-                        echo 'Todo correcto!BIENVENIDO!.<hr>';
-                    }
-                } else {
-                    $error_mail = 'Usuario incorrecto';
-                    $errorFlag = true;
-                }
-            }
-        }
-    } 
-    */
-} else {
-    echo'Botón de ingreso no existe.<hr>';
 }
-
+//FINAL VALIDACIONES
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <main class="row flex flex-justify-center">
+    <form class="col_4 reg_cont" method="POST">
+            <div class="col_12">
+                <h1>Registro</h1>
+            </div>
+            <div class="col_12 inputs">
+                <input type="text" name="nombre" placeholder="Ingrese su nombre" value="<?=$nombre?>">
+                <output class="col_12 msg_error "><?=$errorNombre?></output>
+            </div>
+            <div class="col_12 inputs">
+                <input type="text" name="apellido" placeholder="Ingrese su apellido" value="<?=$apellido?>">
+                <output class="col_12 msg_error "><?=$errorApellido?></output>
+            </div>
+            <div class="col_12 inputs chico">
+                <input type="number" name="DNI" placeholder="Ingrese su DNI" value="<?=$DNI?>">
+                <output class="col_12 msg_error "><?=$errorDNI?></output>
+            </div>
+            <div class="col_12 inputs chico">
+                <input type="date" name="fechaNac" placeholder="Ingrese su fecha de nacimiento" min="<?=$fechaMin;?>"
+                max="<?=$fechaMax;?>" value="<?=$fechaNac?>">
+                <output class="col_12 msg_error "><?=$errorFechaNac?></output>
+            </div>
+            <div class="col_12 inputs column">
+            <div class="col_3 flex flex-align-center">
+                    <input type="radio"name="genero" value="M" <?=($genero=='M')?'checked':''?>>
+                    <label for="M">Masculino</label>
+                </div>
+                <div class="col_3 flex flex-align-center">
+                    <input type="radio" name="genero" value="F"<?=($genero=='F')?'checked':''?>>
+                    <label for="F">Femenino</label>
+                </div>
+                <div class="col_3 flex flex-align-center">
+                    <input type="radio" name="genero" value="O"<?=($genero=='O')?'checked':''?>>
+                    <label for="O">Otro</label>
+                </div>
+                <output class="col_12 msg_error "><?=$errorGenero?></output>
+            </div>
+            <div class="col_12 inputs chico">
+                <input type="text" name="telefono" placeholder="Ingrese su teléfono" value="<?=$telefono?>">
+                <output class="col_12 msg_error "><?=$errorTel?></output>
+            </div>
+            <div class="col_12 inputs chico">
+                <select name="provincia">
+                    <option value="">Selecciona una provincia</option>
+                    <option value="BuenosAires" <?= ($provincia == 'BuenosAires') ? 'selected' : '' ?>
+                    >Buenos Aires</option>
+                    <option value="Catamarca" <?= ($provincia == 'Catamarca') ? 'selected' : '' ?>
+                    >Catamarca</option>
+                    <option value="Chaco" <?= ($provincia == 'Chaco') ? 'selected' : '' ?>
+                    >Chaco</option>
+                    <option value="Chubut" <?= ($provincia == 'Chubut') ? 'selected' : '' ?>
+                    >Chubut</option>
+                    <option value="Córdoba" <?= ($provincia == 'Córdoba') ? 'selected' : '' ?>
+                    >Córdoba</option>
+                    <option value="Corrientes" <?= ($provincia == 'Corrientes') ? 'selected' : '' ?>
+                    >Corrientes</option>
+                    <option value="EntreRíos" <?= ($provincia == 'EntreRíos') ? 'selected' : '' ?>
+                    >Entre Ríos</option>
+                    <option value="Formosa" <?= ($provincia == 'Formosa') ? 'selected' : '' ?>
+                    >Formosa</option>
+                    <option value="Jujuy" <?= ($provincia == 'Jujuy') ? 'selected' : '' ?>
+                    >Jujuy</option>
+                    <option value="LaPampa" <?= ($provincia == 'LaPampa') ? 'selected' : '' ?>
+                    >La Pampa</option>
+                    <option value="LaRioja" <?= ($provincia == 'LaRioja') ? 'selected' : '' ?>
+                    >La Rioja</option>
+                    <option value="Mendoza" <?= ($provincia == 'Mendoza') ? 'selected' : '' ?>
+                    >Mendoza</option>
+                    <option value="Misiones" <?= ($provincia == 'Misiones') ? 'selected' : '' ?>
+                    >Misiones</option>
+                    <option value="Neuquén" <?= ($provincia == 'Neuquén') ? 'selected' : '' ?>
+                    >Neuquén</option>
+                    <option value="RíoNegro" <?= ($provincia == 'RíoNegro') ? 'selected' : '' ?>
+                    >Río Negro</option>
+                    <option value="Salta" <?= ($provincia == 'Salta') ? 'selected' : '' ?>
+                    >Salta</option>
+                    <option value="SanJuan" <?= ($provincia == 'SanJuan') ? 'selected' : '' ?>
+                    >San Juan</option>
+                    <option value="SanLuis" <?= ($provincia == 'SanLuis') ? 'selected' : '' ?>
+                    >San Luis</option>
+                    <option value="SantaCruz" <?= ($provincia == 'SantaCruz') ? 'selected' : '' ?>
+                    >Santa Cruz</option>
+                    <option value="SantaFe" <?= ($provincia == 'SantaFe') ? 'selected' : '' ?>
+                    >Santa Fe</option>
+                    <option value="SantiagoDelEstero" <?= ($provincia == 'SantiagoDelEstero')? 'selected' : '' ?>
+                    >Santiago del Estero</option>
+                    <option value="TierraDelFuego" <?= ($provincia == 'TierraDelFuego') ? 'selected' : '' ?>>
+                    Tierra del Fuego</option>
+                    <option value="Tucumán" <?= ($provincia == 'Tucumán') ? 'selected' : '' ?>
+                    >Tucumán</option>
+                </select>
+                <output class="col_12 msg_error "><?=$errorProvincia?></output>
+            </div>
+            <div class="col_12 inputs">
+                <input type="email" name="mail" placeholder="Ingrese su email" value="<?=$mail?>" autofocus>
+                <output class="col_12 msg_error"><?=$errorMail?></output>
+            </div>
+            <div class="col_12 inputs chico">
+                <input type="password" name="password" placeholder="Ingrese contraseña" value="<?=$password?>">
+                <output class="col_12 msg_error "><?=$errorPass?></output>
+            </div>
+            <div class="col_12 inputs chico">
+                <input type="password" name="password2" placeholder="Vuelva a ingresar contraseña" value="<?=$password2?>">
+                <output class="col_12 msg_error "><?=$errorPass2?></output>
+            </div>
+            <div class="col_12 column flex">
+                <div class="col_12 flex checked">
+                    <input type="checkbox" name="termCond" value="true"<?= ($termCond == 'true') ? 'checked' : '' ?>>
+                    <label for="termCond"> Acepta los términos y condiciones?</label>
+                </div>
+                <output class="col_12 msg_error "><?=$errorTerm?></output>
+            </div>
+            <div class="col_12 flex flex-justify-center button_reg">
+                <button type="submit" name="registro">Registrarse</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

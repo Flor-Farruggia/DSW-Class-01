@@ -51,6 +51,7 @@ h1 {
     border: 2px solid rgb(36, 36, 80);
 }
 .button_reg button{
+    margin-top: 1em;
     padding: 0.5em;
     border-radius: 0.5em;
     border: 2px solid rgb(36, 36, 80);
@@ -64,8 +65,8 @@ h1 {
 label {
     font-size: 1rem;
 }
-.inputs #termCond{
-    width: 1rem;
+.checked {
+    justify-content: flex-start;
 }
 .wrap {
     flex-wrap: wrap;
