@@ -1,5 +1,7 @@
 <?php
-var_dump($_POST);
+
+require_once 'abp/funciones.php';
+
 $nombre = '';
 $apellido = '';
 $DNI = '';
@@ -29,8 +31,6 @@ $errorMail = '';
 $errorPass = '';
 $errorPass2 = '';
 $errorTerm = '';
-
-
 
 if (isset($_POST['registro'])) {
 
@@ -76,7 +76,7 @@ if (isset($_POST['registro'])) {
     #FINAL validaciones NOMBRE ######################################################################
 
     #VALIDACIONES APELLIDO ######################################################################
-    $valApellido = validacion('apellido', 2, 100, 'apellido');
+    $valApellido = validacion('apellido', 3, 100, 'apellido');
 
     if ($valApellido['error']) {
         $errorApellido = $valApellido['msg'];
@@ -102,7 +102,7 @@ if (isset($_POST['registro'])) {
     #FINAL validaciones DNI ######################################################################
 
     #VALIDACIONES FECHA NACIMIENTO ################################################################
-    $valFechaNac = validacion('fechaNac', 10, 10, 'Fecha de nacimiento');
+    $valFechaNac = validacion('fechaNac', 10, 10, 'fecha de nacimiento');
 
     if ($valFechaNac['error']) {
         $errorFechaNac = $valFechaNac['msg'];
@@ -118,27 +118,15 @@ if (isset($_POST['registro'])) {
     #FINAL validaciones FECHA NACIMIENTO ######################################################################
 
     #VALIDACIONES GENERO ######################################################################
-        #existe?
-        if (!isset($_POST['genero'])) {
-            $errorGenero = "No existe campo genero";
-            $errorFlag = true;
-        } else {
-            $genero = trim($_POST['genero']);
-        }
+    $campoValidoGenero = array ('M', 'F', 'O');
 
-        #es un valor válido?
-        $campoValidoGenero = array ('M', 'F', 'O');
-        $generoFlag= true;
-        foreach ($campoValidoGenero as $indice => $value) {
-            if (strtolower($genero) == strtolower($value)) {
-                $generoFlag = false;
-            }
-        }
-        if($generoFlag===true){
-            $errorGenero = "No existe campo genero";
-            $errorFlag = true;
-        }
+    $valGen = validarChecks('genero', 'genero', $campoValidoGenero);
 
+    if ($valGen['error']) {
+        $errorGenero = $valGen['msg'];
+    } else {
+        $genero = $valGen['campo2'];
+    }
 
     #FINAL validaciones GENERO ################################################################
 
@@ -153,31 +141,17 @@ if (isset($_POST['registro'])) {
     #FINAL validaciones TELEFONO################################################################
 
     #VALIDACIONES PROVINCIA ######################################################################
-        //Existe?
-        if (!isset($_POST['provincia'])) {
-            $errorProvincia = "Debe seleccionar una provincia";
-            $errorFlag = true;
-        } else {
-            $provincia = trim($_POST['provincia']);
-        }
+    $provinciasValidas = array("BuenosAires", "Catamarca", "Chaco", "Chubut", "Córdoba", "Corrientes",
+    "EntreRíos", "Formosa", "Jujuy", "LaPampa", "LaRioja", "Mendoza", "Misiones", "Neuquén", "RíoNegro",
+    "Salta", "SanJuan", "SanLuis", "SantaCruz", "SantaFe", "SantiagoDelEstero", "TierraDelFuego", "Tucumán");
 
-        //Provincia válida?
-        $provinciaValida = false;
-        $provinciasValidas = array("BuenosAires", "Catamarca", "Chaco", "Chubut", "Córdoba", "Corrientes",
-        "EntreRíos", "Formosa", "Jujuy", "LaPampa", "LaRioja", "Mendoza", "Misiones", "Neuquén", "RíoNegro",
-        "Salta", "SanJuan", "SanLuis", "SantaCruz", "SantaFe", "SantiagoDelEstero", "TierraDelFuego", "Tucumán");
+    $valProv = validarChecks('provincia', 'provincia', $provinciasValidas);
 
-        foreach ($provinciasValidas as $validProvincia) {
-            if ($provincia === $validProvincia) {
-                $provinciaValida = true;
-                break;
-            }
-        }
-
-        if (!$provinciaValida) {
-            $errorProvincia = "Debe seleccionar una provincia válida";
-            $errorFlag = true;
-        }
+    if ($valProv['error']) {
+        $errorProvincia = $valProv['msg'];
+    } else {
+        $provincia = $valProv['campo2'];
+    }
     #FINAL validaciones PROVINCIA ################################################################
 
     #VALIDACIONES MAIL ######################################################################
@@ -226,12 +200,16 @@ if (isset($_POST['registro'])) {
     #FINAL validaciones SEGUNDA PASSWORD################################################################
     #VALIDACIONES TÉRMINOS Y CONDICIONES ######################################################################
     //Existe?
-    if (!isset($_POST['termCond'])) {
-        $errorTerm = "Debe aceptar los términos y condiciones";
-        $errorFlag = true;
-    } else {
-        $termCond = $_POST['termCond'];
-    }
+    // $termCondVal = array (true, false);
+
+    // $valTerm = validarChecks('termCond', 'terminos y condiciones', $termCondVal);
+
+    // if ($valTerm['error']) {
+    //     $errorTerm = $valTerm['msg'];
+    //     $errorFlag = true;
+    // } else {
+    //     $termCond = $valTerm['campo2'];
+    // }
     #FINAL validaciones TÉRMINOS Y CONDICIONES ################################################################
 
     } else {
@@ -291,7 +269,7 @@ if (isset($_POST['registro'])) {
             </div>
             <div class="col_12 inputs chico">
                 <select name="provincia">
-                    <option value="">Selecciona una provincia</option>
+                    <option value="" selected disabled>Selecciona una provincia</option>
                     <option value="BuenosAires" <?= ($provincia == 'BuenosAires') ? 'selected' : '' ?>
                     >Buenos Aires</option>
                     <option value="Catamarca" <?= ($provincia == 'Catamarca') ? 'selected' : '' ?>

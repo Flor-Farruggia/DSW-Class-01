@@ -3,16 +3,6 @@ $usuarioPrueba_user ='usuario@prueba.ts';
 $usuarioPrueba_pass ='password';
 $usuarioPrueba_passHash = password_hash($usuarioPrueba_pass, PASSWORD_DEFAULT);
 
-
-/**
- *echo "usuario prueba:$usuarioPrueba_user".'<br>';
-*echo 'constraseña prueba: '.$usuarioPrueba_pass.'<br>';
-*echo 'contraseña hasheada: '.$usuarioPrueba_passHash.'<br>';
-
-*echo"<pre>";
-*var_dump('$_POST');
-*echo"</pre>";
- */
 $mail = '';
 $password = '';
 

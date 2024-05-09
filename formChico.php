@@ -32,22 +32,25 @@ if (isset($_POST['enviar'])) {
 
         return $resultado;
     }
-    function soloAlfabetico($texto) {// Expresión regular, si da FALSO entonces tiene otros caracteres no alfabeticos
-        return preg_match('/^[a-zA-Z]+$/', $texto);
+    function validarCampoAlfabetico($campo) {
+        $expresionRegular = '/^[a-zA-ZÀ-ÿ\u00f1\u00d1 ]+$/u';
+        return preg_match($expresionRegular, $campo) === 1;
     }
     #VALIDACIONES NOMBRE ######################################################################
-
     $valNombre = validacion('nombre', 3, 10, 'nombre');
-    $valNombreAlf = soloAlfabetico('nombre');
 
     if ($valNombre['error']) {
         $msg = $valNombre['msg'];
     } else {
-        if ($valNombreAlf==false) {
-            $msg = 'Debe contener solo caracteres alfabéticos';
-            $error = true;
-        }else{
-            $nombre = $valNombre['campo2'];
+        $nombre = $valNombre['campo2'];
+
+        if ($valNombre['error'] == false) {
+            $valNombreAlf = validarCampoAlfabetico($nombre);
+
+            if ($valNombreAlf == false) {
+                $msg = 'Debe contener solo caracteres alfabéticos';
+                $error = true;
+            }
         }
     }
 
@@ -69,7 +72,8 @@ if (isset($_POST['enviar'])) {
                 <h1>Registro</h1>
             </div>
             <div class="col_12 inputs">
-                <input type="text" name="nombre" placeholder="Ingrese su nombre" value="<?=$nombre?>">
+                <input type="text" name="nombre" placeholder="Ingrese su nombre" 
+                pattern="[a-zA-Z']*" value="<?=$nombre?>">
                 <output class="col_12 msg_error"><?=$msg?></output>
             </div>
             <div class="col_12 flex flex-justify-center button_reg">

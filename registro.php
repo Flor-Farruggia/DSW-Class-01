@@ -1,5 +1,7 @@
 <?php
-var_dump($_POST);
+
+require_once 'abm/funciones.php';
+
 $nombre = '';
 $apellido = '';
 $DNI = '';
@@ -16,6 +18,8 @@ $fechaMin = date('1920-01-01'); #104
 $fechaMax = date('2007-01-01'); #17
 $fechaValida = '';
 
+$msg = '';
+
 $errorNombre = '';
 $errorApellido = '';
 $errorDNI = '';
@@ -28,349 +32,181 @@ $errorPass = '';
 $errorPass2 = '';
 $errorTerm = '';
 
-
 if (isset($_POST['registro'])) {
 
     $errorFlag = false;
 
-    #VALIDACIONES NOMBRE ######################################################################
-        #existe?
-        if (!isset($_POST['nombre'])) {
-            $errorNombre = "No existe campo nombre";
-            $errorFlag = true;
+    function validacion($campo, $min, $max, $campoName) {
+        $msg = '';
+        $error = false;
+        $campo2 = '';
+
+        if (!isset($_POST[$campo])) {
+            $msg = "No existe campo ".$campoName;
+            $error = true;
         } else {
-            $nombre = trim($_POST['nombre']);
-        }
-
-        #está vacío?
-        if (empty($errorNombre)) {
-            if (empty($nombre)) {
-                $errorNombre = 'No puede estar vacío';
-                $errorFlag = true;
+            $campo2 = trim($_POST[$campo]);
+            if (empty($campo2)) {
+                $msg = 'No puede estar vacío el campo '.$campoName;
+                $error = true;
             } else {
+                if (strlen($campo2) < $min || strlen($campo2) > $max) {
+                    $msg = 'Por favor ingrese entre '.$min.' y '.$max.' caracteres';
+                    $error = true;
+                } else {
+                }
             }
         }
+        $resultado['msg'] =$msg;
+        $resultado['error'] =$error;
+        $resultado['campo2'] =$campo2;
 
-        #Cantidad caracteres
-        if (empty($errorNombre)) {
-            if (strlen($nombre) < 3 || strlen($nombre) > 100) {
-                $errorNombre = 'Por favor ingreso un nombre entre 3 y 100 caracteres';
-                $errorFlag = true;
-            } else {
-            }
+        return $resultado;
+    }
+
+    #VALIDACIONES NOMBRE ######################################################################
+        $valNombre = validacion('nombre', 3, 100, 'nombre');
+
+        if ($valNombre['error']) {
+            $errorNombre = $valNombre['msg'];
+        } else {
+            $nombre = $valNombre['campo2'];
         }
 
-        #validar caracteres aceptables
-#        if (empty($errorNombre)) {
-#            if () {
-#                $errorNombre = 'Por favor ingreso un nombre con caracteres alfabéticos';
-#                $errorFlag = true;
-#            } else {
-#            }
-#        }
     #FINAL validaciones NOMBRE ######################################################################
 
     #VALIDACIONES APELLIDO ######################################################################
-        #existe?
-        if (!isset($_POST['apellido'])) {
-            $errorApellido = "No existe campo apellido";
-            $errorFlag = true;
-        } else {
-            $apellido = trim($_POST['apellido']);
-        }
+    $valApellido = validacion('apellido', 3, 100, 'apellido');
 
-        #está vacío?
-        if (empty($errorApellido)) {
-            if (empty($apellido)) {
-                $errorApellido = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Cantidad caracteres
-        if (empty($errorApellido)) {
-            if (strlen($apellido) < 3 || strlen($apellido) > 100) {
-                $errorApellido = 'Por favor ingreso un apellido entre 3 y 100 caracteres';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Validar caracteres aceptables
-        if (empty($errorApellido)) {
-            if () {
-                $errorApellido = 'Por favor ingreso un apellido con caracteres alfabéticos';
-                $errorFlag = true;
-            } else {
-            }
-        }
+    if ($valApellido['error']) {
+        $errorApellido = $valApellido['msg'];
+    } else {
+        $apellido = $valApellido['campo2'];
+    }
     #FINAL validaciones APELLIDO ######################################################################
 
     #VALIDACIONES DNI ######################################################################
-        #existe?
-        if (!isset($_POST['DNI'])) {
-            $errorDNI = "No existe campo DNI";
-            $errorFlag = true;
-        } else {
-            $DNI = trim($_POST['DNI']);
-        }
+    $valDNI = validacion('DNI', 7, 11, 'DNI');
 
-        #está vacío?
-        if (empty($errorDNI)) {
-            if (empty($DNI)) {
-                $errorDNI = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Cant. números
-        if (empty($errorDNI)) {
-            if (strlen($DNI) < 7 || strlen($DNI) > 11) {
-                $errorDNI = 'Por favor ingrese un DNI entre 7 y 11 números';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Caracteres numéricos
-        if (empty($errorDNI)) {
-            if (!is_numeric($DNI)) {
+    if ($valDNI['error']) {
+        $errorDNI = $valDNI['msg'];
+    } else {
+            if (!is_numeric($valDNI['campo2'])) {
                 $errorDNI = 'Por favor ingrese solo números';
-                $errorFlag = true;
+                $error = true;
             } else {
+                $DNI = $valDNI['campo2'];
             }
-        }
+    }
+
     #FINAL validaciones DNI ######################################################################
 
-    #VALIDACIONES FECHA NACIMIENTO ######################################################################
-        #existe?
-        if (!isset($_POST['fechaNac'])) {
-            $errorFechaNac = "No existe campo Fecha de nacimiento";
+    #VALIDACIONES FECHA NACIMIENTO ################################################################
+    $valFechaNac = validacion('fechaNac', 10, 10, 'fecha de nacimiento');
+
+    if ($valFechaNac['error']) {
+        $errorFechaNac = $valFechaNac['msg'];
+    } else {
+        $fechaValida =  Strtotime($fechaNac);
+        if ($fechaValida !== false) {
+            $errorFechaNac = 'Formato de fecha inválido';
             $errorFlag = true;
         } else {
-            $fechaNac = trim($_POST['fechaNac']);
+            $fechaNac = $valFechaNac['campo2'];
         }
-
-        #está vacío?
-        if (empty($errorFechaNac)) {
-            if (empty($fechaNac)) {
-                $errorFechaNac = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-        #Cantidad caracteres
-        if (empty($errorFechaNac)) {
-            if (strlen($fechaNac) < 10 || strlen($fechaNac) > 10) {
-                $errorFechaNac = 'Por favor ingrese una fecha válida como 2000-12-10';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Validación formato fecha
-        if (empty($errorFechaNac)) {
-            $fechaValida =  Strtotime($fechaNac);
-            if ($fechaValida !== false) {
-                $errorFechaNac = 'Formato de fecha inválido';
-                $errorFlag = true;
-            } else {
-            }
-        }
+    }
     #FINAL validaciones FECHA NACIMIENTO ######################################################################
 
     #VALIDACIONES GENERO ######################################################################
-        #existe?
-        if (!isset($_POST['genero'])) {
-            $errorGenero = "No existe campo genero";
-            $errorFlag = true;
-        } else {
-            $genero = trim($_POST['genero']);
-        }
+    $campoValidoGenero = array ('M', 'F', 'O');
 
-        #es un valor válido?
-        $campoValidoGenero = array ('M', 'F', 'O');
-        $generoFlag= true;
-        foreach ($campoValidoGenero as $indice => $value) {
-            if (strtolower($genero) == strtolower($value)) {
-                $generoFlag = false;
-            }
-        }
-        if($generoFlag===true){
-            $errorGenero = "No existe campo genero";
-            $errorFlag = true; 
-        }
+    $valGen = validarChecks('genero', 'genero', $campoValidoGenero);
 
-
+    if ($valGen['error']) {
+        $errorGenero = $valGen['msg'];
+    } else {
+        $genero = $valGen['campo2'];
+    }
     #FINAL validaciones GENERO ################################################################
 
     #VALIDACIONES TELEFONO ######################################################################
-        #existe?
-        if (!isset($_POST['telefono'])) {
-            $errorTel = "No existe campo telefono";
-            $errorFlag = true;
+        $valTel = validacion('telefono', 9, 18, 'teléfono');
+
+        if ($valTel['error']) {
+            $errorTel = $valTel['msg'];
         } else {
-            $telefono = trim($_POST['telefono']);
+            $telefono = $valTel['campo2'];
         }
-
-        #está vacío?
-        if (empty($errorTel)) {
-            if (empty($telefono)) {
-                $errorTel = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #caracteres validos (numericos)
-        //Está mal porque si en el número agregan el (+54) te desconfigura todo
-//        if (empty($errorTel)) {
-//            if (!is_numeric($telefono)) {
-//                $errorTel = 'Por favor ingrese solo números';
-//                $errorFlag = true;
-//            } else {
-//            }
-//        }
     #FINAL validaciones TELEFONO################################################################
 
     #VALIDACIONES PROVINCIA ######################################################################
-        #existe?
-        if (!isset($_POST['provincia'])) {
-            $errorProvincia = "No existe campo provincia";
-            $errorFlag = true;
-        } else {
-            $provincia = trim($_POST['provincia']);
-        }
+    $provinciasValidas = array("BuenosAires", "Catamarca", "Chaco", "Chubut", "Córdoba", "Corrientes",
+    "EntreRíos", "Formosa", "Jujuy", "LaPampa", "LaRioja", "Mendoza", "Misiones", "Neuquén", "RíoNegro",
+    "Salta", "SanJuan", "SanLuis", "SantaCruz", "SantaFe", "SantiagoDelEstero", "TierraDelFuego", "Tucumán");
 
-        #está vacío? ---------------DEBERÍA SER SI ESTÁ SELECTED EN ALGUNA OPCIÓN---------
-        if (empty($errorProvincia)) {
-            if (empty($Provincia)) {
-                $errorProvincia = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
+    $valProv = validarChecks('provincia', 'provincia', $provinciasValidas);
+
+    if ($valProv['error']) {
+        $errorProvincia = $valProv['msg'];
+    } else {
+        $provincia = $valProv['campo2'];
+    }
     #FINAL validaciones PROVINCIA ################################################################
 
     #VALIDACIONES MAIL ######################################################################
-        #existe?
-        if (!isset($_POST['mail'])) {
-            $errorMail = "No existe mail";
-            $errorFlag = true;
+    $valMail = validacion('mail', 5, 120, 'e-mail');
+
+    if ($valMail['error']) {
+        $errorMail = $valMail['msg'];
+    } else {
+        if (!filter_var($valMail['campo2'], FILTER_VALIDATE_EMAIL)) {
+            $errorMail = 'Formato no válido';
+            $error = true;
         } else {
-            $mail = trim($_POST['mail']);
+            $mail = $valMail['campo2'];
         }
-
-        #está vacío?
-        if (empty($errorMail)) {
-            if (empty($mail)) {
-                $errorMail = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Cantidad caracteres
-        if (empty($errorMail)) {
-            if (strlen($mail) < 5 || strlen($mail) > 120) {
-                $errorMail = 'Por favor ingreso un mail entre 5 y 120 caracteres';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Formato válido
-            if (empty($errorMail)) {
-                if (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
-                    $errorMail = 'Formato no válido';
-                    $errorFlag = true;
-                } else {
-            }
-        }
+    }
     #FINAL validaciones mail ######################################################################
 
     #INICIO VALIDACIONES PASSWORD ######################################################################
+    $valPass = validacion('password', 5, 10, 'contraseña');
 
-        #Existe?
-        if (!isset($_POST['password'])) {
-            $errorPass = 'No existe contraseña';
-            $errorFlag = true;
-        } else {
-            $password = trim($_POST['password']);
-        }
-
-        #Vacío?
-        if (empty($errorPass)) {
-            if (empty($password)) {
-                $errorPass = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Caracteres validos?
-        if (empty($errorPass)){
-            if (strlen($password) < 3 || strlen($password) > 10) {
-                $errorPass = 'Por favor ingrese una contraseña entre 3 y 10 caracteres';
-                $errorFlag = true;
-            } else {
-            }
-        }
+    if ($valPass['error']) {
+        $errorPass = $valPass['msg'];
+    } else {
+        $password = $valPass['campo2'];
+    }
     #FINAL validaciones password ######################################################################
-    
+
     #VALIDACIONES SEGUNDA PASSWORD ######################################################################
-    
-        #Existe?
-        if (!isset($_POST['password2'])) {
-            $errorPass2 = 'No existe segunda contraseña';
+    $valPass2 = validacion('password2', 5, 10, 'contraseña');
+
+    if ($valPass2['error']) {
+        $errorPass2 = $valPass2['msg'];
+    } else {
+        $password2 = $valPass2['campo2'];
+    }
+
+    #Es la misma que la anterior?
+    if (empty($errorPass&&$errorPass2)){
+        if ($password !== $password2) {
+            $errorPass = 'Por favor ingrese la misma contraseña en ambos campos';
+            $errorPass2 = 'Por favor ingrese la misma contraseña en ambos campos';
             $errorFlag = true;
         } else {
-            $password2 = trim($_POST['password2']);
         }
-
-        #Vacío?
-        if (empty($errorPass2)) {
-            if (empty($password2)) {
-                $errorPass2 = 'No puede estar vacío';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Caracteres validos?
-        if (empty($errorPass2)){
-            if (strlen($password2) < 3 || strlen($password2) > 10) {
-                $errorPass2 = 'Por favor ingrese una contraseña entre 3 y 10 caracteres';
-                $errorFlag = true;
-            } else {
-            }
-        }
-
-        #Es la misma que la anterior?
-        if (empty($errorPass&&$errorPass2)){
-            if ($password !== $password2) {
-                $errorPass = 'Por favor ingrese la misma contraseña en ambos campos';
-                $errorPass2 = 'Por favor ingrese la misma contraseña en ambos campos';
-                $errorFlag = true;
-            } else {
-            }
-        }
+    }
     #FINAL validaciones SEGUNDA PASSWORD################################################################
 
-    #VALIDACIONES TERMINOS Y CONDICIONES ######################################################################
-        #Existe?
-        if (!isset($_POST['termCond'])) {
-            $errorTerm = 'No existen los termino y condiciones';
-            $errorFlag = true;
-        } else {
-            $termCond = trim($_POST['termCond']);
-        }
-        #está en check?
-        
-
-    #FINAL validaciones TERMINOS Y CONDICIONES################################################################
+    #VALIDACIONES TÉRMINOS Y CONDICIONES ######################################################################
+    //Existe?
+    if (!isset($_POST['termCond'])) {
+        $errorTerm = "Debe aceptar los términos y condiciones";
+        $errorFlag = true;
+    } else {
+        $termCond = $_POST['termCond'];
+    }
+    #FINAL validaciones TÉRMINOS Y CONDICIONES ################################################################
 
     } else {
 }
@@ -387,7 +223,7 @@ if (isset($_POST['registro'])) {
 </head>
 <body>
     <main class="row flex flex-justify-center">
-        <form class="col_4 reg_cont" method="POST">
+    <form class="col_4 reg_cont" method="POST">
             <div class="col_12">
                 <h1>Registro</h1>
             </div>
@@ -429,30 +265,53 @@ if (isset($_POST['registro'])) {
             </div>
             <div class="col_12 inputs chico">
                 <select name="provincia">
-                    <option value="">Selecciona una provincia</option>
-                    <option value="BuenosAires">Buenos Aires</option>
-                    <option value="Catamarca">Catamarca</option>
-                    <option value="Chaco">Chaco</option>
-                    <option value="Chubut">Chubut</option>
-                    <option value="Córdoba">Córdoba</option>
-                    <option value="Corrientes">Corrientes</option>
-                    <option value="EntreRíos">Entre Ríos</option>
-                    <option value="Formosa">Formosa</option>
-                    <option value="Jujuy">Jujuy</option>
-                    <option value="LaPampa">La Pampa</option>
-                    <option value="LaRioja">La Rioja</option>
-                    <option value="Mendoza">Mendoza</option>
-                    <option value="Misiones">Misiones</option>
-                    <option value="Neuquén">Neuquén</option>
-                    <option value="RíoNegro">Río Negro</option>
-                    <option value="Salta">Salta</option>
-                    <option value="SanJuan">San Juan</option>
-                    <option value="SanLuis">San Luis</option>
-                    <option value="SantaCruz">Santa Cruz</option>
-                    <option value="SantaFe">Santa Fe</option>
-                    <option value="SantiagoDelEstero">Santiago del Estero</option>
-                    <option value="TierraDelFuego">Tierra del Fuego</option>
-                    <option value="Tucumán">Tucumán</option>
+                    <option value="" selected disabled>Selecciona una provincia</option>
+                    <option value="BuenosAires" <?= ($provincia == 'BuenosAires') ? 'selected' : '' ?>
+                    >Buenos Aires</option>
+                    <option value="Catamarca" <?= ($provincia == 'Catamarca') ? 'selected' : '' ?>
+                    >Catamarca</option>
+                    <option value="Chaco" <?= ($provincia == 'Chaco') ? 'selected' : '' ?>
+                    >Chaco</option>
+                    <option value="Chubut" <?= ($provincia == 'Chubut') ? 'selected' : '' ?>
+                    >Chubut</option>
+                    <option value="Córdoba" <?= ($provincia == 'Córdoba') ? 'selected' : '' ?>
+                    >Córdoba</option>
+                    <option value="Corrientes" <?= ($provincia == 'Corrientes') ? 'selected' : '' ?>
+                    >Corrientes</option>
+                    <option value="EntreRíos" <?= ($provincia == 'EntreRíos') ? 'selected' : '' ?>
+                    >Entre Ríos</option>
+                    <option value="Formosa" <?= ($provincia == 'Formosa') ? 'selected' : '' ?>
+                    >Formosa</option>
+                    <option value="Jujuy" <?= ($provincia == 'Jujuy') ? 'selected' : '' ?>
+                    >Jujuy</option>
+                    <option value="LaPampa" <?= ($provincia == 'LaPampa') ? 'selected' : '' ?>
+                    >La Pampa</option>
+                    <option value="LaRioja" <?= ($provincia == 'LaRioja') ? 'selected' : '' ?>
+                    >La Rioja</option>
+                    <option value="Mendoza" <?= ($provincia == 'Mendoza') ? 'selected' : '' ?>
+                    >Mendoza</option>
+                    <option value="Misiones" <?= ($provincia == 'Misiones') ? 'selected' : '' ?>
+                    >Misiones</option>
+                    <option value="Neuquén" <?= ($provincia == 'Neuquén') ? 'selected' : '' ?>
+                    >Neuquén</option>
+                    <option value="RíoNegro" <?= ($provincia == 'RíoNegro') ? 'selected' : '' ?>
+                    >Río Negro</option>
+                    <option value="Salta" <?= ($provincia == 'Salta') ? 'selected' : '' ?>
+                    >Salta</option>
+                    <option value="SanJuan" <?= ($provincia == 'SanJuan') ? 'selected' : '' ?>
+                    >San Juan</option>
+                    <option value="SanLuis" <?= ($provincia == 'SanLuis') ? 'selected' : '' ?>
+                    >San Luis</option>
+                    <option value="SantaCruz" <?= ($provincia == 'SantaCruz') ? 'selected' : '' ?>
+                    >Santa Cruz</option>
+                    <option value="SantaFe" <?= ($provincia == 'SantaFe') ? 'selected' : '' ?>
+                    >Santa Fe</option>
+                    <option value="SantiagoDelEstero" <?= ($provincia == 'SantiagoDelEstero')? 'selected' : '' ?>
+                    >Santiago del Estero</option>
+                    <option value="TierraDelFuego" <?= ($provincia == 'TierraDelFuego') ? 'selected' : '' ?>>
+                    Tierra del Fuego</option>
+                    <option value="Tucumán" <?= ($provincia == 'Tucumán') ? 'selected' : '' ?>
+                    >Tucumán</option>
                 </select>
                 <output class="col_12 msg_error "><?=$errorProvincia?></output>
             </div>
@@ -465,12 +324,14 @@ if (isset($_POST['registro'])) {
                 <output class="col_12 msg_error "><?=$errorPass?></output>
             </div>
             <div class="col_12 inputs chico">
-                <input type="password" name="password" placeholder="Vuelva a ingresar contraseña" value="<?=$password2?>">
+                <input type="password" name="password2" placeholder="Vuelva a ingresar contraseña" value="<?=$password2?>">
                 <output class="col_12 msg_error "><?=$errorPass2?></output>
             </div>
-            <div class="col_12 inputs column">
-                <input type="checkbox" name="termCond" value="termCond">
-                <label for="termCond"> Acepta los términos y condiciones?</label>
+            <div class="col_12 column flex">
+                <div class="col_12 flex checked">
+                    <input type="checkbox" name="termCond" value="true"<?= ($termCond == 'true') ? 'checked' : '' ?>>
+                    <label for="termCond"> Acepta los términos y condiciones?</label>
+                </div>
                 <output class="col_12 msg_error "><?=$errorTerm?></output>
             </div>
             <div class="col_12 flex flex-justify-center button_reg">
